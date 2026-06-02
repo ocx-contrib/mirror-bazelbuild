@@ -1,0 +1,89 @@
+name: bazelisk
+target:
+  registry: ocx.sh
+  repository: bazelisk
+
+source:
+  type: github_release
+  owner: bazelbuild
+  repo: bazelisk
+  tag_pattern: "^v(?P<version>\\d+\\.\\d+\\.\\d+)$"
+
+# Raw binaries — no archive. One file per platform, versionless names.
+# Windows assets carry a `.exe` suffix on the asset automatically.
+#
+# Intentionally EXCLUDED (anchored ^...$ already prevents sidecar matches):
+#   - bazelisk-darwin         (legacy alias for darwin-amd64, no arch suffix)
+#   - bazelisk-amd64.deb      (Debian package distribution)
+#   - bazelisk-arm64.deb      (Debian package distribution)
+#   - *.sha256                (GitHub digest sidecars — we use github_asset_digest: true)
+assets:
+  linux/amd64:
+    - "^bazelisk-linux-amd64$"
+  linux/arm64:
+    - "^bazelisk-linux-arm64$"
+  darwin/amd64:
+    - "^bazelisk-darwin-amd64$"
+  darwin/arm64:
+    - "^bazelisk-darwin-arm64$"
+  windows/amd64:
+    - "^bazelisk-windows-amd64\\.exe$"
+  # windows/arm64 is intentionally NOT mirrored: bazelisk ships an arm64
+  # launcher, but it cannot do its job there — upstream Bazel publishes no
+  # windows-arm64 binary, so `bazelisk` on Windows ARM has no Bazel to fetch.
+  # Mirroring a non-functional launcher would only red the smoke (no bazel to
+  # download). Windows ARM users run the windows/amd64 build under emulation.
+
+asset_type:
+  # Raw binary on every platform. The asset lands as `bazelisk` (the Windows
+  # asset keeps the `.exe` suffix from the source name automatically).
+  type: binary
+  name: bazelisk
+
+metadata:
+  default: metadata.json
+
+skip_prereleases: true
+cascade: true
+build_timestamp: none
+
+versions:
+  min: "1.25.0"
+  new_per_run: 5
+  # Poll upstream every 6 hours for new releases. Without this the generated
+  # workflow only fires on workflow_dispatch + push, never auto-discovering.
+  poll_interval: "0 */6 * * *"
+
+verify:
+  github_asset_digest: true
+
+concurrency:
+  max_downloads: 8
+  max_bundles: 4
+  max_pushes: 2
+  rate_limit_ms: 100
+  max_retries: 3
+  compression_threads: 0
+
+tests:
+  - name: smoke
+    script: tests/smoke.star
+
+platforms:
+  linux/amd64:
+    runner: ubuntu-latest
+  linux/arm64:
+    runner: ubuntu-24.04-arm
+  darwin/amd64:
+    # Intel slice tested on the arm64 macos-14 runner via Rosetta 2 (GitHub's
+    # macos-13 Intel pool is exhausted and deadlocks the push job).
+    runner: macos-14
+  darwin/arm64:
+    runner: macos-14
+  windows/amd64:
+    runner: windows-latest
+    shell: pwsh
+
+notify:
+  discord:
+    webhook_secret: OCX_MIRROR_DISCORD_HOOK
