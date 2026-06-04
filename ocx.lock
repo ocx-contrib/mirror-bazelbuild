@@ -3,14 +3,14 @@ lock_version = 1
 declaration_hash_version = 1
 declaration_hash = "sha256:006fbb4cafe557d7741dcaf4c0f124dc967146c4b925eee9ab6c18dd8ee82ba5"
 generated_by = "ocx 0.3.5"
-generated_at = "2026-06-02T23:16:48Z"
+generated_at = "2026-06-04T11:23:49Z"
 
 [[tool]]
 name = "cli"
 group = "default"
-pinned = "dev.ocx.sh/ocx/cli@sha256:85ec7cb24343bdf9aef33bc56bc7400c7f97e54f75b716cf0ecb77d43f13472d"
+pinned = "dev.ocx.sh/ocx/cli@sha256:a6854d21a124974146dd7753a978b551aa52721e9b7fcebb7922ed7f4f3c7bfa"
 
 [[tool]]
 name = "mirror"
 group = "default"
-pinned = "dev.ocx.sh/ocx/mirror@sha256:f26b247894fc1aff688bf476f15da1ee99c9cd069ec1c57d70b2ada20395c32b"
+pinned = "dev.ocx.sh/ocx/mirror@sha256:ee27fa62aad554742e1dd01506c528ec7c3c2b8db93fdea28ff5963768b42c62"
