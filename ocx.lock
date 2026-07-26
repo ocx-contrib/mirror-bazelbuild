@@ -1,9 +1,9 @@
 [metadata]
-lock_version = 3
+lock_version = 2
 declaration_hash_version = 1
 declaration_hash = "sha256:8a4b81d00ec70fdb930b8f1c5324b27f7087339e3cb903e1d177f26cf1278e55"
 generated_by = "ocx 0.4.3"
-generated_at = "2026-07-26T20:06:03Z"
+generated_at = "2026-07-26T20:07:11Z"
 
 [[tool]]
 name = "cli"
