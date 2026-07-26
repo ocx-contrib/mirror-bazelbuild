@@ -24,6 +24,9 @@ concurrency:
 jobs:
   discover:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
     outputs:
       has_new: ${{ steps.plan.outputs.has_new }}
       versions: ${{ steps.plan.outputs.versions }}
@@ -31,6 +34,17 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
       - uses: ocx-sh/setup-ocx@de8e3366f812941423985eaccae28663ef192e8b  # v1.3.0
+      # `pipeline plan` reads the target's tags. ghcr.io answers an
+      # anonymous read of a missing or private repository with 403 DENIED
+      # rather than 404, so an unauthenticated discover can never see the
+      # empty target a first publish starts from. docker login so ocx picks
+      # the credential up via its native-credential fallback.
+      - name: Login to ghcr.io
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" \
+            | docker login ghcr.io \
+                -u "${{ github.actor }}" \
+                --password-stdin
       - id: plan
         name: Plan versions
         # `GITHUB_TOKEN` is forwarded to the in-process octocrab client so
