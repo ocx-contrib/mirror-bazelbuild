@@ -1,16 +1,32 @@
 [metadata]
-lock_version = 1
+lock_version = 3
 declaration_hash_version = 1
-declaration_hash = "sha256:a2748c22a44aad19ffb4dcd016a8dbd7da70f169cb6a45fe2cba834756457dda"
-generated_by = "ocx 0.3.6"
-generated_at = "2026-07-16T13:25:55Z"
+declaration_hash = "sha256:8a4b81d00ec70fdb930b8f1c5324b27f7087339e3cb903e1d177f26cf1278e55"
+generated_by = "ocx 0.4.3"
+generated_at = "2026-07-26T20:06:03Z"
 
 [[tool]]
 name = "cli"
 group = "default"
-pinned = "dev.ocx.sh/ocx/cli@sha256:075ff11deda2d9929849cb253293d8674afec325a3a8a75926d72e3f0a0331a7"
+repository = "dev.ocx.sh/ocx/cli"
+
+[tool.platforms]
+"darwin/amd64" = "sha256:f10f56e50e3c31ee35a8b20b86f2b2c71346372f4597e260d2179c0c16617ed1"
+"darwin/arm64" = "sha256:2e8f2de027c01aa1e1d53983d32af0d22d82504bbd86f4b4fe0f49e4ef23aa66"
+"linux/amd64" = "sha256:20ba418bbb2fa1ddff2fd4a1ac5c5a2605c06be3d21ff24800829bfde7c6ad95"
+"linux/arm64" = "sha256:9e1e02cb65ac0d05d8afe57865aa98c87dbd0c7b9a85533aa27bf59e2a8cf123"
+"windows/amd64" = "sha256:890048de08000f4dba3dd68037ee2cc6ad68a73d46040cdd0c7c5eaf18f9628f"
+"windows/arm64" = "sha256:44bd7169ba53cf92fc1645f31b1a8f6596eed79dd32a11d37dfd4ae3cea8dcce"
 
 [[tool]]
 name = "mirror"
 group = "default"
-pinned = "dev.ocx.sh/ocx/mirror@sha256:46a248add79174f55626b4476ee54c301a56e7b9742c32f37c3a229b21ab2f86"
+repository = "dev.ocx.sh/ocx/mirror"
+
+[tool.platforms]
+"darwin/amd64" = "sha256:10c343620e09b90223cdb7bc758cf6a13962ac9bcb913e7916cbd0581c6fcaf2"
+"darwin/arm64" = "sha256:52cc7e4d6228e68ef5c7e582434becf7cf03a1572ce2e1027af493cc9d5f8e6c"
+"linux/amd64" = "sha256:c869edadd2ddec70a61bebb0842af06c98b92b021edad44719f305a941251b13"
+"linux/arm64" = "sha256:4932c1dfa7ba6ca51933d93680dbe879b48cd3bcfd4c4a88e6cc3839e4ba81c5"
+"windows/amd64" = "sha256:01a6d2d2ed6bda215ed5949dd38a09a9c4a562c1c8fa3aa4bd7dfdb532aae674"
+"windows/arm64" = "sha256:ffaccf766684ff9a32646ae1fac3d9294bdb06ddb03a539bcf6848a0b8cb2043"

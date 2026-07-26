@@ -42,11 +42,11 @@ jobs:
       # fallback (`get_docker_auth` in crates/ocx_lib/src/auth.rs). Env-var
       # auth (`OCX_AUTH_<REG>_USER/_TOKEN`) takes precedence inside ocx, so do
       # NOT also export those vars here.
-      - name: Login to ocx.sh
+      - name: Login to ghcr.io
         if: ${{ steps.creds.outputs.have == 'true' }}
         run: |
           echo "${{ secrets.OCX_MIRROR_REGISTRY_TOKEN }}" \
-            | docker login ocx.sh \
+            | docker login ghcr.io \
                 -u "${{ secrets.OCX_MIRROR_REGISTRY_USER }}" \
                 --password-stdin
       - name: Publish catalog metadata

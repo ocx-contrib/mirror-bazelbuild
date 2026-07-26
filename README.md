@@ -1,8 +1,9 @@
-# mirror-bazelisk
+# mirror-bazelbuild
 
 OCX mirror for [Bazelisk](https://github.com/bazelbuild/bazelisk).
-Publishes GitHub releases to `ocx.sh/bazelisk` with cascade tags after a
-smoke test per `(version, platform)`.
+Publishes GitHub releases to `ghcr.io/ocx-contrib/bazelbuild/bazelisk` with
+cascade tags after a smoke test per `(version, platform)`, then announces the
+result into the OCX index as `ocx.sh/bazelbuild/bazelisk`.
 
 Bazelisk is the Bazel version launcher — it reads `.bazelversion` (or the
 `USE_BAZEL_VERSION` env var) and automatically downloads + invokes the correct
@@ -12,7 +13,7 @@ is transparent.
 ## Install with OCX
 
 ```sh
-ocx install ocx.sh/bazelisk
+ocx install ocx.sh/bazelbuild/bazelisk
 ```
 
 This places `bazelisk` (and `bazelisk.exe` on Windows) on your `PATH`. To use
@@ -40,8 +41,12 @@ CI fails on drift via `ocx-mirror pipeline generate ci --check`.
 
 | Secret | Use |
 |--------|-----|
-| `OCX_MIRROR_REGISTRY_TOKEN` + `OCX_MIRROR_REGISTRY_USER` | `ocx package push` to `ocx.sh` |
+| `OCX_ANNOUNCE_TOKEN` | opens the index pull request from `ocx-contrib/index` |
 | `OCX_MIRROR_DISCORD_HOOK` | notify-stage Discord webhook URL |
+
+The GHCR push uses the run's own `GITHUB_TOKEN` (`permissions: packages: write`),
+so it needs no registry secret. `OCX_MIRROR_REGISTRY_*` stays pointed at `ocx.sh`
+for the other mirrors and is not read here.
 
 (Inherited from the `ocx-contrib` org with visibility ALL.)
 

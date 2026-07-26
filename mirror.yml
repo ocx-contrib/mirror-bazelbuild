@@ -1,7 +1,11 @@
 name: bazelisk
+# Logical index package `bazelbuild/bazelisk` lives at the physical path
+# `ghcr.io/ocx-contrib/bazelbuild/bazelisk` — slash segments, never flattened
+# (E-P4). GHCR needs no repo per path segment; repo linkage comes from the
+# `org.opencontainers.image.source` annotation.
 target:
-  registry: ocx.sh
-  repository: bazelisk
+  registry: ghcr.io
+  repository: ocx-contrib/bazelbuild/bazelisk
 
 source:
   type: github_release
@@ -88,3 +92,9 @@ notify:
   discord:
     webhook_secret: OCX_MIRROR_DISCORD_HOOK
     user_id: "227748867204972545"  # pinged in-message on failures
+
+# Logical name is spelled out, not derived from target.repository — the two are
+# related by convention only. Needs OCX_ANNOUNCE_TOKEN (ocx-contrib org secret).
+announce:
+  package: bazelbuild/bazelisk
+  fork: ocx-contrib/index
