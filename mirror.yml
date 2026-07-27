@@ -73,10 +73,6 @@ tests:
   - name: smoke
     script: tests/smoke.star
 
-# Required as soon as any platform declares `containers:`.
-ocx_mirror:
-  release_tag: v0.4.0
-
 platforms:
   # Container legs, not native ones: bazelisk is a single static Go binary, so
   # its published `os.features` is empty (E-P2) — a claim that is only true if
