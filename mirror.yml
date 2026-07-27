@@ -73,11 +73,31 @@ tests:
   - name: smoke
     script: tests/smoke.star
 
+# Required as soon as any platform declares `containers:`.
+ocx_mirror:
+  release_tag: v0.4.0
+
 platforms:
+  # Container legs, not native ones: bazelisk is a single static Go binary, so
+  # its published `os.features` is empty (E-P2) — a claim that is only true if
+  # the artifact actually loads under a musl userland as well as a glibc one.
+  # A native ubuntu leg can never show that. Each image runs the same bundle
+  # under its own loader, and `(version, platform)` is green only when all
+  # three are, which is what gates the push.
   linux/amd64:
     runner: ubuntu-latest
+    containers:
+      - { image: "ubuntu:24.04", shell: bash }
+      - { image: "alpine:3.20",  shell: sh }
+      - { image: "fedora:40",    shell: bash }
   linux/arm64:
+    # arm64 container legs run natively — no qemu — so the runner arch must
+    # match the platform or the renderer's guard reds the leg up front.
     runner: ubuntu-24.04-arm
+    containers:
+      - { image: "ubuntu:24.04", shell: bash }
+      - { image: "alpine:3.20",  shell: sh }
+      - { image: "fedora:40",    shell: bash }
   darwin/amd64:
     # Intel slice tested on the arm64 macos-14 runner via Rosetta 2 (GitHub's
     # macos-13 Intel pool is exhausted and deadlocks the push job).
