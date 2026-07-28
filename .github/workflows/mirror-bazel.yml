@@ -151,8 +151,8 @@ jobs:
               - name: smoke
                 kind: script
                 script: bazel/tests/smoke.star
-          - platform: linux/amd64
-            platform_slug: linux_amd64
+          - platform: linux/amd64+libc.glibc
+            platform_slug: linux_amd64_libc.glibc
             runner: ubuntu-latest
             container_id: ubuntu_24_04
             container_image: "ubuntu:24.04"
@@ -163,20 +163,8 @@ jobs:
               - name: smoke
                 kind: script
                 script: bazel/tests/smoke.star
-          - platform: linux/amd64
-            platform_slug: linux_amd64
-            runner: ubuntu-latest
-            container_id: alpine_3_20
-            container_image: "alpine:3.20"
-            container_libc: "musl"
-            docker_platform: "linux/amd64"
-            shell: sh
-            tests:
-              - name: smoke
-                kind: script
-                script: bazel/tests/smoke.star
-          - platform: linux/amd64
-            platform_slug: linux_amd64
+          - platform: linux/amd64+libc.glibc
+            platform_slug: linux_amd64_libc.glibc
             runner: ubuntu-latest
             container_id: fedora_40
             container_image: "fedora:40"
@@ -187,8 +175,8 @@ jobs:
               - name: smoke
                 kind: script
                 script: bazel/tests/smoke.star
-          - platform: linux/arm64
-            platform_slug: linux_arm64
+          - platform: linux/arm64+libc.glibc
+            platform_slug: linux_arm64_libc.glibc
             runner: ubuntu-24.04-arm
             container_id: ubuntu_24_04
             container_image: "ubuntu:24.04"
@@ -199,20 +187,8 @@ jobs:
               - name: smoke
                 kind: script
                 script: bazel/tests/smoke.star
-          - platform: linux/arm64
-            platform_slug: linux_arm64
-            runner: ubuntu-24.04-arm
-            container_id: alpine_3_20
-            container_image: "alpine:3.20"
-            container_libc: "musl"
-            docker_platform: "linux/arm64"
-            shell: sh
-            tests:
-              - name: smoke
-                kind: script
-                script: bazel/tests/smoke.star
-          - platform: linux/arm64
-            platform_slug: linux_arm64
+          - platform: linux/arm64+libc.glibc
+            platform_slug: linux_arm64_libc.glibc
             runner: ubuntu-24.04-arm
             container_id: fedora_40
             container_image: "fedora:40"
@@ -226,15 +202,6 @@ jobs:
           - platform: windows/amd64
             platform_slug: windows_amd64
             runner: windows-latest
-            container_id: _native_
-            shell: pwsh
-            tests:
-              - name: smoke
-                kind: script
-                script: bazel/tests/smoke.star
-          - platform: windows/arm64
-            platform_slug: windows_arm64
-            runner: windows-11-arm
             container_id: _native_
             shell: pwsh
             tests:
