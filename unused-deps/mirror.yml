@@ -1,0 +1,77 @@
+name: unused-deps
+target:
+  registry: ghcr.io
+  repository: ocx-contrib/bazelbuild/unused-deps
+
+source:
+  type: github_release
+  owner: bazelbuild
+  repo: buildtools
+  # buildtools tags are bare X.Y.Z, unlike bazelisk's `v`-prefixed tags.
+  tag_pattern: "^(?P<version>\\d+\\.\\d+\\.\\d+)$"
+
+# Raw binaries — no archive. One file per platform, versionless names.
+#
+# Naming discontinuity: the asset is `unused_deps-*` (underscore) through
+# 8.2.1 and `unused-deps-*` (hyphen) from 8.5.1 on — upstream renamed the
+# published asset but kept the source directory `unused_deps`. One anchored
+# pattern covers both spellings; it stays unambiguous because only one
+# spelling exists per release. windows/arm64 only exists from 8.5.1 on —
+# no dedicated floor needed, see versions comment below.
+#
+# Intentionally EXCLUDED (anchored ^...$ already prevents sidecar matches):
+#   - bare "unused_deps"/"unused-deps" (4.0.1 legacy, no platform suffix)
+#   - *-linux-riscv64         (intermittent upstream platform, not mirrored)
+#   - *-linux-s390x           (intermittent upstream platform, not mirrored)
+assets:
+  linux/amd64:
+    - "^unused[_-]deps-linux-amd64$"
+  linux/arm64:
+    - "^unused[_-]deps-linux-arm64$"
+  darwin/amd64:
+    - "^unused[_-]deps-darwin-amd64$"
+  darwin/arm64:
+    - "^unused[_-]deps-darwin-arm64$"
+  windows/amd64:
+    - "^unused[_-]deps-windows-amd64\\.exe$"
+  windows/arm64:
+    - "^unused[_-]deps-windows-arm64\\.exe$"
+
+asset_type:
+  type: binary
+  # Published under the hyphenated spelling regardless of which asset name
+  # the source release actually used — the underscore is an upstream source
+  # directory quirk, not something we surface.
+  name: unused-deps
+
+metadata:
+  default: metadata.json
+
+catalog:
+  logo: ../logo.svg
+
+skip_prereleases: true
+cascade: true
+build_timestamp: none
+
+versions:
+  # First release with darwin/arm64 for all three buildtools binaries;
+  # 4.0.1 confirmed lacking it, the range in between was not bisected.
+  # windows/arm64 doesn't exist before 8.5.1, but that needs no floor: an
+  # asset that doesn't exist simply never resolves for the earlier versions.
+  min: "5.0.0"
+  new_per_run: 5
+  # Staggered against buildifier/buildozer so the three don't hit the
+  # GitHub releases API in the same minute.
+  poll_interval: "40 */6 * * *"
+
+verify:
+  github_asset_digest: true
+
+tests:
+  - name: version
+    command: unused-deps --version
+
+announce:
+  package: bazelbuild/unused-deps
+  fork: ocx-contrib/index

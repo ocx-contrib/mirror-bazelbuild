@@ -1,0 +1,63 @@
+name: buildifier
+target:
+  registry: ghcr.io
+  repository: ocx-contrib/bazelbuild/buildifier
+
+source:
+  type: github_release
+  owner: bazelbuild
+  repo: buildtools
+  # buildtools tags are bare X.Y.Z, unlike bazelisk's `v`-prefixed tags.
+  tag_pattern: "^(?P<version>\\d+\\.\\d+\\.\\d+)$"
+
+# Raw binaries — no archive. One file per platform, versionless names.
+#
+# Intentionally EXCLUDED (anchored ^...$ already prevents sidecar matches):
+#   - bare "buildifier"       (4.0.1 legacy, no platform suffix)
+#   - *-linux-riscv64         (intermittent upstream platform, not mirrored)
+#   - *-linux-s390x           (intermittent upstream platform, not mirrored)
+assets:
+  linux/amd64:
+    - "^buildifier-linux-amd64$"
+  linux/arm64:
+    - "^buildifier-linux-arm64$"
+  darwin/amd64:
+    - "^buildifier-darwin-amd64$"
+  darwin/arm64:
+    - "^buildifier-darwin-arm64$"
+  windows/amd64:
+    - "^buildifier-windows-amd64\\.exe$"
+  windows/arm64:
+    - "^buildifier-windows-arm64\\.exe$"
+
+asset_type:
+  type: binary
+  name: buildifier
+
+metadata:
+  default: metadata.json
+
+catalog:
+  logo: ../logo.svg
+
+skip_prereleases: true
+cascade: true
+build_timestamp: none
+
+versions:
+  # First release with darwin/arm64 for all three buildtools binaries;
+  # 4.0.1 confirmed lacking it, the range in between was not bisected.
+  min: "5.0.0"
+  new_per_run: 5
+  poll_interval: "0 */6 * * *"
+
+verify:
+  github_asset_digest: true
+
+tests:
+  - name: version
+    command: buildifier --version
+
+announce:
+  package: bazelbuild/buildifier
+  fork: ocx-contrib/index

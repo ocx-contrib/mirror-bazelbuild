@@ -1,0 +1,88 @@
+name: bazel
+target:
+  registry: ghcr.io
+  repository: ocx-contrib/bazelbuild/bazel
+
+source:
+  type: github_release
+  owner: bazelbuild
+  repo: bazel
+  # bazel tags are bare X.Y.Z, unlike bazelisk's `v`-prefixed tags.
+  tag_pattern: "^(?P<version>\\d+\\.\\d+\\.\\d+)$"
+
+# Two flavors of the same release: the default ships the bundled JDK, nojdk
+# doesn't (for environments that supply their own JVM). Both are raw
+# binaries, disjoint by literal prefix (`bazel-` vs `bazel_nojdk-`), so
+# anchoring alone keeps them from cross-matching each other.
+#
+# Intentionally EXCLUDED (anchored ^...$ already prevents sidecar matches):
+#   - *.sha256                       (GitHub digest sidecars — we use github_asset_digest: true)
+#   - *.sig                          (release signatures)
+#   - bazel-*-dist.zip                (source distribution, not a binary)
+#   - bazel-*-installer-*.sh          (self-extracting installer, not a raw binary)
+#   - bazel_*-linux-x86_64.deb        (Debian package distribution)
+#   - the Windows .zip beside each platform's .exe
+variants:
+  - default: true
+    assets:
+      linux/amd64:
+        - "^bazel-.*-linux-x86_64$"
+      linux/arm64:
+        - "^bazel-.*-linux-arm64$"
+      darwin/amd64:
+        - "^bazel-.*-darwin-x86_64$"
+      darwin/arm64:
+        - "^bazel-.*-darwin-arm64$"
+      windows/amd64:
+        - "^bazel-.*-windows-x86_64\\.exe$"
+      windows/arm64:
+        - "^bazel-.*-windows-arm64\\.exe$"
+  - name: nojdk
+    assets:
+      linux/amd64:
+        - "^bazel_nojdk-.*-linux-x86_64$"
+      linux/arm64:
+        - "^bazel_nojdk-.*-linux-arm64$"
+      darwin/amd64:
+        - "^bazel_nojdk-.*-darwin-x86_64$"
+      darwin/arm64:
+        - "^bazel_nojdk-.*-darwin-arm64$"
+      windows/amd64:
+        - "^bazel_nojdk-.*-windows-x86_64\\.exe$"
+      windows/arm64:
+        - "^bazel_nojdk-.*-windows-arm64\\.exe$"
+
+asset_type:
+  type: binary
+  # Both variants install as "bazel" — nojdk is a drop-in replacement for the
+  # default binary, not a companion tool, so the invocation stays the same
+  # regardless of which flavor is installed.
+  name: bazel
+
+metadata:
+  default: metadata.json
+
+catalog:
+  logo: ../logo.svg
+
+skip_prereleases: true
+cascade: true
+build_timestamp: none
+
+versions:
+  min: "6.0.0"
+  new_per_run: 5
+  # Staggered against the repo's other specs so they don't all hit the
+  # GitHub releases API in the same minute.
+  poll_interval: "10 */6 * * *"
+
+verify:
+  github_asset_digest: true
+
+tests:
+  - name: version
+    command: bazel --version
+
+announce:
+  package: bazelbuild/bazel
+  fork: ocx-contrib/index

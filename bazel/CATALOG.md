@@ -1,0 +1,44 @@
+---
+title: Bazel
+description: Google's multi-language build and test tool — reproducible, incremental builds that scale from a laptop to a monorepo with thousands of targets
+keywords: bazel,build,build-system,google,monorepo,bazelbuild
+---
+
+# Bazel
+
+Bazel is Google's open-source build and test tool. It models a build as a
+dependency graph, hashes every input, and skips anything that hasn't
+changed, so a rebuild after touching one file stays fast even in a workspace
+with thousands of targets, and a build that succeeds on one machine
+reproduces the same outputs on another.
+
+Most workspaces pin the version they build with via `.bazelversion` and
+launch Bazel through **bazelisk** rather than installing this package
+directly. Mirror `bazel` itself when you want one version pinned without a
+launcher indirection — a container image, an air-gapped build, or a CI job
+that shouldn't have to resolve `.bazelversion` at all.
+
+## What's included
+
+- **bazel** (default variant) — the single static binary, JDK included.
+- **bazel** (`nojdk` variant) — the same binary without the bundled JDK, for
+  environments that already supply their own JVM and want a smaller
+  download. Both variants install as `bazel`; only the release asset
+  fetched differs.
+
+## Usage
+
+```sh
+bazel build //...
+```
+
+Builds every target in the workspace. Bazel reads the `MODULE.bazel` (or
+`WORKSPACE`) and `BUILD` files under the current directory the same way it
+does when launched through bazelisk.
+
+## Links
+
+Apache-2.0 licensed.
+
+- [Bazel on GitHub](https://github.com/bazelbuild/bazel)
+- [Bazel Documentation](https://bazel.build/docs)

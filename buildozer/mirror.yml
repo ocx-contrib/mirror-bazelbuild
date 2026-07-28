@@ -1,0 +1,65 @@
+name: buildozer
+target:
+  registry: ghcr.io
+  repository: ocx-contrib/bazelbuild/buildozer
+
+source:
+  type: github_release
+  owner: bazelbuild
+  repo: buildtools
+  # buildtools tags are bare X.Y.Z, unlike bazelisk's `v`-prefixed tags.
+  tag_pattern: "^(?P<version>\\d+\\.\\d+\\.\\d+)$"
+
+# Raw binaries — no archive. One file per platform, versionless names.
+#
+# Intentionally EXCLUDED (anchored ^...$ already prevents sidecar matches):
+#   - bare "buildozer"        (4.0.1 legacy, no platform suffix)
+#   - *-linux-riscv64         (intermittent upstream platform, not mirrored)
+#   - *-linux-s390x           (intermittent upstream platform, not mirrored)
+assets:
+  linux/amd64:
+    - "^buildozer-linux-amd64$"
+  linux/arm64:
+    - "^buildozer-linux-arm64$"
+  darwin/amd64:
+    - "^buildozer-darwin-amd64$"
+  darwin/arm64:
+    - "^buildozer-darwin-arm64$"
+  windows/amd64:
+    - "^buildozer-windows-amd64\\.exe$"
+  windows/arm64:
+    - "^buildozer-windows-arm64\\.exe$"
+
+asset_type:
+  type: binary
+  name: buildozer
+
+metadata:
+  default: metadata.json
+
+catalog:
+  logo: ../logo.svg
+
+skip_prereleases: true
+cascade: true
+build_timestamp: none
+
+versions:
+  # First release with darwin/arm64 for all three buildtools binaries;
+  # 4.0.1 confirmed lacking it, the range in between was not bisected.
+  min: "5.0.0"
+  new_per_run: 5
+  # Staggered against buildifier/unused-deps so the three don't hit the
+  # GitHub releases API in the same minute.
+  poll_interval: "20 */6 * * *"
+
+verify:
+  github_asset_digest: true
+
+tests:
+  - name: version
+    command: buildozer --version
+
+announce:
+  package: bazelbuild/buildozer
+  fork: ocx-contrib/index
