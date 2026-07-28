@@ -12,6 +12,7 @@ on:
       # `script:` paths resolve from the repository root, not from buildozer/ —
       # keep this spec's scripts under buildozer/ so editing one triggers this run.
       - buildozer/**
+      - mirror-base.yml
       - .github/workflows/describe-buildozer.yml
 
 concurrency:

@@ -1,3 +1,5 @@
+extends: ../mirror-base.yml
+
 name: unused-deps
 target:
   registry: ghcr.io
@@ -48,11 +50,9 @@ metadata:
   default: metadata.json
 
 catalog:
+  # The logo is shared by every package in the repo and the default probe only
+  # looks in the spec's own directory, so it is named explicitly.
   logo: ../logo.svg
-
-skip_prereleases: true
-cascade: true
-build_timestamp: none
 
 versions:
   # First release with darwin/arm64 for all three buildtools binaries;
@@ -61,16 +61,15 @@ versions:
   # asset that doesn't exist simply never resolves for the earlier versions.
   min: "5.0.0"
   new_per_run: 5
-  # Staggered against buildifier/buildozer so the three don't hit the
-  # GitHub releases API in the same minute.
+  # Staggered against the repo's other specs so the five don't hit the GitHub
+  # releases API in the same minute.
   poll_interval: "40 */6 * * *"
 
-verify:
-  github_asset_digest: true
-
 tests:
-  - name: version
-    command: unused-deps --version
+  # `script:` paths resolve from the repository root, not from this spec's
+  # directory — unlike `metadata.default` and `catalog.*`.
+  - name: smoke
+    script: unused-deps/tests/smoke.star
 
 announce:
   package: bazelbuild/unused-deps

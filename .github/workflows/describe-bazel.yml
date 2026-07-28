@@ -12,6 +12,7 @@ on:
       # `script:` paths resolve from the repository root, not from bazel/ —
       # keep this spec's scripts under bazel/ so editing one triggers this run.
       - bazel/**
+      - mirror-base.yml
       - .github/workflows/describe-bazel.yml
 
 concurrency:

@@ -1,3 +1,5 @@
+extends: ../mirror-base.yml
+
 name: buildozer
 target:
   registry: ghcr.io
@@ -11,6 +13,8 @@ source:
   tag_pattern: "^(?P<version>\\d+\\.\\d+\\.\\d+)$"
 
 # Raw binaries — no archive. One file per platform, versionless names.
+# windows/arm64 exists from 8.5.1 on; earlier versions simply resolve no asset
+# for it, so no per-platform floor is needed.
 #
 # Intentionally EXCLUDED (anchored ^...$ already prevents sidecar matches):
 #   - bare "buildozer"        (4.0.1 legacy, no platform suffix)
@@ -38,27 +42,24 @@ metadata:
   default: metadata.json
 
 catalog:
+  # The logo is shared by every package in the repo and the default probe only
+  # looks in the spec's own directory, so it is named explicitly.
   logo: ../logo.svg
-
-skip_prereleases: true
-cascade: true
-build_timestamp: none
 
 versions:
   # First release with darwin/arm64 for all three buildtools binaries;
   # 4.0.1 confirmed lacking it, the range in between was not bisected.
   min: "5.0.0"
   new_per_run: 5
-  # Staggered against buildifier/unused-deps so the three don't hit the
-  # GitHub releases API in the same minute.
-  poll_interval: "20 */6 * * *"
-
-verify:
-  github_asset_digest: true
+  # Staggered against the repo's other specs so the five don't hit the GitHub
+  # releases API in the same minute.
+  poll_interval: "30 */6 * * *"
 
 tests:
-  - name: version
-    command: buildozer --version
+  # `script:` paths resolve from the repository root, not from this spec's
+  # directory — unlike `metadata.default` and `catalog.*`.
+  - name: smoke
+    script: buildozer/tests/smoke.star
 
 announce:
   package: bazelbuild/buildozer

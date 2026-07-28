@@ -12,6 +12,7 @@ on:
       # `script:` paths resolve from the repository root, not from unused-deps/ —
       # keep this spec's scripts under unused-deps/ so editing one triggers this run.
       - unused-deps/**
+      - mirror-base.yml
       - .github/workflows/describe-unused-deps.yml
 
 concurrency:

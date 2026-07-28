@@ -9,5 +9,6 @@
       "value": "${installPath}",
       "visibility": "public"
     }
-  ]
+  ],
+  "binaries": ["buildifier"]
 }

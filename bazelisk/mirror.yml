@@ -1,3 +1,5 @@
+extends: ../mirror-base.yml
+
 name: bazelisk
 # Logical index package `bazelbuild/bazelisk` lives at the physical path
 # `ghcr.io/ocx-contrib/bazelbuild/bazelisk` — slash segments, never flattened
@@ -37,6 +39,9 @@ assets:
   # windows-arm64 binary, so `bazelisk` on Windows ARM has no Bazel to fetch.
   # Mirroring a non-functional launcher would only red the smoke (no bazel to
   # download). Windows ARM users run the windows/amd64 build under emulation.
+  # The base declares a windows/arm64 test leg for the packages that do ship
+  # one; with no asset here it never enters a version's platform set, so that
+  # leg skips every version instead of reding on a missing bundle.
 
 asset_type:
   # Raw binary on every platform. The asset lands as `bazelisk` (the Windows
@@ -47,67 +52,26 @@ asset_type:
 metadata:
   default: metadata.json
 
-skip_prereleases: true
-cascade: true
-build_timestamp: none
+catalog:
+  # `readme:` defaults to this spec directory's CATALOG.md. The logo is shared
+  # by every package in the repo and the default probe only looks in the
+  # spec's own directory, so it is named explicitly.
+  logo: ../logo.svg
 
 versions:
   min: "1.25.0"
   new_per_run: 5
   # Poll upstream every 6 hours for new releases. Without this the generated
   # workflow only fires on workflow_dispatch + push, never auto-discovering.
+  # Staggered against the repo's other specs so the five don't hit the GitHub
+  # releases API in the same minute.
   poll_interval: "0 */6 * * *"
 
-verify:
-  github_asset_digest: true
-
-concurrency:
-  max_downloads: 8
-  max_bundles: 4
-  max_pushes: 2
-  rate_limit_ms: 100
-  max_retries: 3
-  compression_threads: 0
-
 tests:
+  # `script:` paths resolve from the repository root, not from this spec's
+  # directory — unlike `metadata.default` and `catalog.*`.
   - name: smoke
-    script: tests/smoke.star
-
-platforms:
-  # Container legs, not native ones: bazelisk is a single static Go binary, so
-  # its published `os.features` is empty (E-P2) — a claim that is only true if
-  # the artifact actually loads under a musl userland as well as a glibc one.
-  # A native ubuntu leg can never show that. Each image runs the same bundle
-  # under its own loader, and `(version, platform)` is green only when all
-  # three are, which is what gates the push.
-  linux/amd64:
-    runner: ubuntu-latest
-    containers:
-      - { image: "ubuntu:24.04", shell: bash }
-      - { image: "alpine:3.20",  shell: sh }
-      - { image: "fedora:40",    shell: bash }
-  linux/arm64:
-    # arm64 container legs run natively — no qemu — so the runner arch must
-    # match the platform or the renderer's guard reds the leg up front.
-    runner: ubuntu-24.04-arm
-    containers:
-      - { image: "ubuntu:24.04", shell: bash }
-      - { image: "alpine:3.20",  shell: sh }
-      - { image: "fedora:40",    shell: bash }
-  darwin/amd64:
-    # Intel slice tested on the arm64 macos-14 runner via Rosetta 2 (GitHub's
-    # macos-13 Intel pool is exhausted and deadlocks the push job).
-    runner: macos-14
-  darwin/arm64:
-    runner: macos-14
-  windows/amd64:
-    runner: windows-latest
-    shell: pwsh
-
-notify:
-  discord:
-    webhook_secret: OCX_MIRROR_DISCORD_HOOK
-    user_id: "227748867204972545"  # pinged in-message on failures
+    script: bazelisk/tests/smoke.star
 
 # Logical name is spelled out, not derived from target.repository — the two are
 # related by convention only. Needs OCX_ANNOUNCE_TOKEN (ocx-contrib org secret).

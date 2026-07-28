@@ -12,6 +12,7 @@ on:
       # `script:` paths resolve from the repository root, not from buildifier/ —
       # keep this spec's scripts under buildifier/ so editing one triggers this run.
       - buildifier/**
+      - mirror-base.yml
       - .github/workflows/describe-buildifier.yml
 
 concurrency:

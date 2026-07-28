@@ -20,11 +20,10 @@ that shouldn't have to resolve `.bazelversion` at all.
 
 ## What's included
 
-- **bazel** (default variant) — the single static binary, JDK included.
-- **bazel** (`nojdk` variant) — the same binary without the bundled JDK, for
-  environments that already supply their own JVM and want a smaller
-  download. Both variants install as `bazel`; only the release asset
-  fetched differs.
+- **bazel** — the single binary, bundling its own Java runtime. It needs no
+  JDK on the host and runs wherever it lands. Upstream's `nojdk` build, which
+  drops that runtime and requires a host JVM, is not mirrored for that
+  reason.
 
 ## Usage
 

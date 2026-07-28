@@ -1,0 +1,82 @@
+# Shared base for every spec in this repository.
+#
+# `extends:` is a SHALLOW merge of top-level keys — a child that sets any key
+# below replaces it whole, there is no per-key merge into these blocks. Keep
+# what is genuinely repo-wide here; anything a package owns (name, target,
+# source, assets/variants, asset_type, metadata, catalog, tests, versions,
+# announce) stays in the package's own mirror.yml.
+#
+# Not a spec: it has no `name`/`target`/`source` and is never loaded on its
+# own — only merged under a child.
+
+skip_prereleases: true
+cascade: true
+
+# `date`, not `none`: a cascade tag (`latest`, `X`, `X.Y`) re-points on every
+# re-publish, and without a build segment the new manifest reuses the version
+# tag, orphaning the prior digest for registry GC to reap — which breaks any
+# `@sha256:` pin. The date segment gives each re-publish its own version tag,
+# so the old digest keeps a tag of its own. `datetime` would do the same at
+# second granularity; `date` is enough for mirrors that poll every 6 hours.
+build_timestamp: date
+
+verify:
+  github_asset_digest: true
+
+concurrency:
+  max_downloads: 8
+  max_bundles: 4
+  max_pushes: 2
+  rate_limit_ms: 100
+  max_retries: 3
+  compression_threads: 0
+
+platforms:
+  # Container legs, not native ones: these are single static binaries, so the
+  # published `os.features` is empty (E-P2) — a claim that is only true if the
+  # artifact actually loads under a musl userland as well as a glibc one. A
+  # native ubuntu leg can never show that. Each image runs the same bundle
+  # under its own loader, and `(version, platform)` is green only when all
+  # three are, which is what gates the push.
+  #
+  # This block is the SUPERSET across every package in the repo, not any one
+  # package's platform set — do not trim it to match the spec you are reading.
+  # A platform declared here but absent from a package's `assets:` costs
+  # nothing: it never enters a version's resolved platform set, so the leg
+  # skips it and push never evaluates it. The reverse is fatal — a platform
+  # that resolves an asset but has no entry here has no test leg, so push
+  # reds it as `missing_junit` and never publishes it. Hence windows/arm64
+  # lives here even though bazelisk does not mirror it.
+  linux/amd64:
+    runner: ubuntu-latest
+    containers:
+      - { image: "ubuntu:24.04", shell: bash }
+      - { image: "alpine:3.20",  shell: sh }
+      - { image: "fedora:40",    shell: bash }
+  linux/arm64:
+    # arm64 container legs run natively — no qemu — so the runner arch must
+    # match the platform or the renderer's guard reds the leg up front.
+    runner: ubuntu-24.04-arm
+    containers:
+      - { image: "ubuntu:24.04", shell: bash }
+      - { image: "alpine:3.20",  shell: sh }
+      - { image: "fedora:40",    shell: bash }
+  darwin/amd64:
+    # Intel slice tested on the arm64 macos-14 runner via Rosetta 2 (GitHub's
+    # macos-13 Intel pool is exhausted and deadlocks the push job).
+    runner: macos-14
+  darwin/arm64:
+    runner: macos-14
+  windows/amd64:
+    runner: windows-latest
+    shell: pwsh
+  windows/arm64:
+    # Native arm64 Windows runner — the amd64 pool cannot execute an arm64
+    # binary, and there is no Rosetta equivalent to lean on.
+    runner: windows-11-arm
+    shell: pwsh
+
+notify:
+  discord:
+    webhook_secret: OCX_MIRROR_DISCORD_HOOK
+    user_id: "227748867204972545"  # pinged in-message on failures
