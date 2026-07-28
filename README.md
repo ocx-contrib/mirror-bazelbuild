@@ -72,14 +72,28 @@ New-Item -ItemType SymbolicLink -Path "$env:PATH_ENTRY\bazel.exe" -Target (Get-C
 
 ## Editing
 
+One directory per package — `bazelisk/`, `bazel/`, `buildifier/`, `buildozer/`,
+`unused-deps/` — each holding its own `mirror.yml`, `metadata.json`,
+`CATALOG.md` and `tests/`. `mirror-base.yml` at the root carries what all five
+share (`platforms:`, `concurrency:`, `notify:`, `verify:`, `skip_prereleases`,
+`cascade`, `build_timestamp`); each spec pulls it in with
+`extends: ../mirror-base.yml`. The merge is shallow, so a spec that needs a
+different `platforms:` matrix restates the whole block.
+
 | File | Edit | Regenerate after |
 |------|------|------------------|
-| `mirror.yml` | hand | `ocx-mirror pipeline generate ci` |
-| `tests/smoke.star` | hand | — |
-| `metadata.json`, `CATALOG.md`, `logo.*` | hand | — |
-| `.github/workflows/*.yml` | generated | re-run when `mirror.yml` changes |
+| `<pkg>/mirror.yml`, `mirror-base.yml` | hand | `ocx-mirror pipeline generate ci` |
+| `<pkg>/tests/smoke.star` | hand | — |
+| `<pkg>/metadata.json`, `<pkg>/CATALOG.md`, `logo.*` | hand | — |
+| `.github/workflows/*.yml` | generated | re-run when any spec changes |
 
 CI fails on drift via `ocx-mirror pipeline generate ci --check`.
+
+`metadata.json`'s `binaries` claim is only preserved by an `ocx` new enough to
+know the field — an older one parses the sidecar and silently drops it. A
+package published before the field existed therefore shows as `metadata-drift`
+until it is re-pushed or patched, which is expected, not a spec error. (The
+note lives here because JSON takes no comments.)
 
 ## Required secrets
 

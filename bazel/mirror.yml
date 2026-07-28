@@ -1,0 +1,75 @@
+extends: ../mirror-base.yml
+
+name: bazel
+target:
+  registry: ghcr.io
+  repository: ocx-contrib/bazelbuild/bazel
+
+source:
+  type: github_release
+  owner: bazelbuild
+  repo: bazel
+  # bazel tags are bare X.Y.Z, unlike bazelisk's `v`-prefixed tags.
+  tag_pattern: "^(?P<version>\\d+\\.\\d+\\.\\d+)$"
+
+# Raw binaries — no archive. The standard distribution bundles its own JRE,
+# so the mirrored binary runs on a host with no Java installed.
+#
+# Intentionally EXCLUDED (anchored ^...$ already prevents sidecar matches):
+#   - bazel_nojdk-*                   (same binary minus the bundled JRE, so it
+#                                      needs a host JVM — a package that fails
+#                                      at runtime for a dependency the metadata
+#                                      never declares. Mirroring it honestly
+#                                      would mean an OCX dependency on a JDK
+#                                      package, and the bundled-JRE build is
+#                                      strictly simpler than that.)
+#   - *.sha256                       (GitHub digest sidecars — we use github_asset_digest: true)
+#   - *.sig                          (release signatures)
+#   - bazel-*-dist.zip                (source distribution, not a binary)
+#   - bazel-*-installer-*.sh          (self-extracting installer, not a raw binary)
+#   - bazel_*-linux-x86_64.deb        (Debian package distribution)
+#   - the Windows .zip beside each platform's .exe
+assets:
+  linux/amd64:
+    - "^bazel-.*-linux-x86_64$"
+  linux/arm64:
+    - "^bazel-.*-linux-arm64$"
+  darwin/amd64:
+    - "^bazel-.*-darwin-x86_64$"
+  darwin/arm64:
+    - "^bazel-.*-darwin-arm64$"
+  windows/amd64:
+    - "^bazel-.*-windows-x86_64\\.exe$"
+  windows/arm64:
+    - "^bazel-.*-windows-arm64\\.exe$"
+
+asset_type:
+  # The versioned release asset (`bazel-9.2.0-linux-x86_64`) lands as plain
+  # `bazel`, so the installed command matches every upstream invocation.
+  type: binary
+  name: bazel
+
+metadata:
+  default: metadata.json
+
+catalog:
+  # The logo is shared by every package in the repo and the default probe only
+  # looks in the spec's own directory, so it is named explicitly.
+  logo: ../logo.svg
+
+versions:
+  min: "6.0.0"
+  new_per_run: 5
+  # Staggered against the repo's other specs so the five don't hit the GitHub
+  # releases API in the same minute.
+  poll_interval: "10 */6 * * *"
+
+tests:
+  # `script:` paths resolve from the repository root, not from this spec's
+  # directory — unlike `metadata.default` and `catalog.*`.
+  - name: smoke
+    script: bazel/tests/smoke.star
+
+announce:
+  package: bazelbuild/bazel
+  fork: ocx-contrib/index

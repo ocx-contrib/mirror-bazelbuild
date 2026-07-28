@@ -1,0 +1,66 @@
+extends: ../mirror-base.yml
+
+name: buildifier
+target:
+  registry: ghcr.io
+  repository: ocx-contrib/bazelbuild/buildifier
+
+source:
+  type: github_release
+  owner: bazelbuild
+  repo: buildtools
+  # buildtools tags are bare X.Y.Z, unlike bazelisk's `v`-prefixed tags.
+  tag_pattern: "^(?P<version>\\d+\\.\\d+\\.\\d+)$"
+
+# Raw binaries — no archive. One file per platform, versionless names.
+# windows/arm64 exists from 8.5.1 on; earlier versions simply resolve no asset
+# for it, so no per-platform floor is needed.
+#
+# Intentionally EXCLUDED (anchored ^...$ already prevents sidecar matches):
+#   - bare "buildifier"       (4.0.1 legacy, no platform suffix)
+#   - *-linux-riscv64         (intermittent upstream platform, not mirrored)
+#   - *-linux-s390x           (intermittent upstream platform, not mirrored)
+assets:
+  linux/amd64:
+    - "^buildifier-linux-amd64$"
+  linux/arm64:
+    - "^buildifier-linux-arm64$"
+  darwin/amd64:
+    - "^buildifier-darwin-amd64$"
+  darwin/arm64:
+    - "^buildifier-darwin-arm64$"
+  windows/amd64:
+    - "^buildifier-windows-amd64\\.exe$"
+  windows/arm64:
+    - "^buildifier-windows-arm64\\.exe$"
+
+asset_type:
+  type: binary
+  name: buildifier
+
+metadata:
+  default: metadata.json
+
+catalog:
+  # The logo is shared by every package in the repo and the default probe only
+  # looks in the spec's own directory, so it is named explicitly.
+  logo: ../logo.svg
+
+versions:
+  # First release with darwin/arm64 for all three buildtools binaries;
+  # 4.0.1 confirmed lacking it, the range in between was not bisected.
+  min: "5.0.0"
+  new_per_run: 5
+  # Staggered against the repo's other specs so the five don't hit the GitHub
+  # releases API in the same minute.
+  poll_interval: "20 */6 * * *"
+
+tests:
+  # `script:` paths resolve from the repository root, not from this spec's
+  # directory — unlike `metadata.default` and `catalog.*`.
+  - name: smoke
+    script: buildifier/tests/smoke.star
+
+announce:
+  package: bazelbuild/buildifier
+  fork: ocx-contrib/index
