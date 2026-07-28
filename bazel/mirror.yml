@@ -29,10 +29,21 @@ source:
 #   - bazel-*-installer-*.sh          (self-extracting installer, not a raw binary)
 #   - bazel_*-linux-x86_64.deb        (Debian package distribution)
 #   - the Windows .zip beside each platform's .exe
+#   - bazel-*-windows-arm64.exe       (see the windows/arm64 note below)
+#
+# The Linux keys carry `+libc.glibc`. Unlike every other package in this repo,
+# bazel is NOT a static binary: it is a C++ launcher around an embedded install
+# base with a bundled JRE, and it is linked against glibc. Upstream publishes no
+# musl build — the only Linux assets are the glibc `bazel-*` and `bazel_nojdk-*`
+# pair. Declaring the libc makes that requirement part of the published
+# platform rather than a promise the artifact cannot keep: without it the
+# package claims an empty `os.features`, and an Alpine consumer resolves a
+# binary whose ELF interpreter does not exist on their system, failing with a
+# bare "No such file or directory" for a file that is plainly there.
 assets:
-  linux/amd64:
+  linux/amd64+libc.glibc:
     - "^bazel-.*-linux-x86_64$"
-  linux/arm64:
+  linux/arm64+libc.glibc:
     - "^bazel-.*-linux-arm64$"
   darwin/amd64:
     - "^bazel-.*-darwin-x86_64$"
@@ -40,8 +51,13 @@ assets:
     - "^bazel-.*-darwin-arm64$"
   windows/amd64:
     - "^bazel-.*-windows-x86_64\\.exe$"
-  windows/arm64:
-    - "^bazel-.*-windows-arm64\\.exe$"
+  # windows/arm64 is NOT mirrored. Upstream ships the asset, but 9.0.1 fails
+  # during `Extracting Bazel installation...` with exit 36 on a native
+  # windows-11-arm runner — the launcher cannot unpack its own embedded install
+  # base, so nothing downstream of that is testable. Only 9.0.1 was observed;
+  # if a later release turns out to work, scope the hole instead of dropping
+  # the platform: declare it here and give `platforms."windows/arm64"` an
+  # `exclude:` entry carrying a `min_version`/`max_version` range.
 
 asset_type:
   # The versioned release asset (`bazel-9.2.0-linux-x86_64`) lands as plain
@@ -69,6 +85,39 @@ tests:
   # directory — unlike `metadata.default` and `catalog.*`.
   - name: smoke
     script: bazel/tests/smoke.star
+
+# Restated in full, not merged: `extends:` is a SHALLOW merge, so setting this
+# key replaces the base's block outright. The darwin and windows entries below
+# are therefore copies of the base's, unchanged.
+#
+# The difference from the base is the Linux legs. The base tests every Linux
+# artifact under ubuntu, alpine and fedora precisely to prove a static binary
+# loads under musl as well as glibc. bazel makes no such claim — its platform
+# keys say `+libc.glibc` — so an alpine leg would assert something the package
+# has never promised and would red every run. It tests under the two glibc
+# images instead, which still covers two distinct distributions and loaders.
+platforms:
+  linux/amd64+libc.glibc:
+    runner: ubuntu-latest
+    containers:
+      - { image: "ubuntu:24.04", shell: bash }
+      - { image: "fedora:40",    shell: bash }
+  linux/arm64+libc.glibc:
+    # arm64 container legs run natively — no qemu — so the runner arch must
+    # match the platform or the renderer's guard reds the leg up front.
+    runner: ubuntu-24.04-arm
+    containers:
+      - { image: "ubuntu:24.04", shell: bash }
+      - { image: "fedora:40",    shell: bash }
+  darwin/amd64:
+    # Intel slice tested on the arm64 macos-14 runner via Rosetta 2 (GitHub's
+    # macos-13 Intel pool is exhausted and deadlocks the push job).
+    runner: macos-14
+  darwin/arm64:
+    runner: macos-14
+  windows/amd64:
+    runner: windows-latest
+    shell: pwsh
 
 announce:
   package: bazelbuild/bazel
