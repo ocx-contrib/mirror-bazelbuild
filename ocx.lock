@@ -1,32 +1,32 @@
 [metadata]
-lock_version = 2
+lock_version = 3
 declaration_hash_version = 1
-declaration_hash = "sha256:8a4b81d00ec70fdb930b8f1c5324b27f7087339e3cb903e1d177f26cf1278e55"
-generated_by = "ocx 0.4.3"
-generated_at = "2026-07-28T23:25:12Z"
+declaration_hash = "sha256:765ced77af3d6cd06b0e1f542daa7f3e5f02b9a88391474881f44dac63cdc0b9"
+generated_by = "ocx 0.5.0"
+generated_at = "2026-08-01T19:00:29Z"
 
 [[tool]]
 name = "cli"
 group = "default"
-repository = "dev.ocx.sh/ocx/cli"
+repository = "ocx.sh/ocx/cli"
 
 [tool.platforms]
-"darwin/amd64" = "sha256:ebf56635b1ac4e484d3da88fffb43fca9ffbdcbdaa9643d95897b1f27b44e098"
-"darwin/arm64" = "sha256:44996a5ee27d7df1027750e8372123e833924b971a83611ffa8a30af9f4b5e2e"
-"linux/amd64" = "sha256:60c9c656ef15df4ceb389e222d5ba827324d1acf76cd61058ba6506e771f1eba"
-"linux/arm64" = "sha256:73ec55bc6e2037fb60fb14b85ce240497a2a9f1104db19c90da5fc29d555a240"
-"windows/amd64" = "sha256:0052515b561bcea3f46b6b5de89a1b2b35c6785fe868acb78541dfdc7cfe97ee"
-"windows/arm64" = "sha256:d165d29bc6224412cb25e5a7882c6a2d52383034d0957a877e5f273497d5fd60"
+"darwin/amd64" = "sha256:23c7027fbd09709647bb6691fcd82a5b4cad57ad9c1b5bdcc97d79ab3163ebaf"
+"darwin/arm64" = "sha256:9f8595fe452ad412c9b414805725ae540fc1074c9409061bb5d63660f8f3d3dd"
+"linux/amd64" = "sha256:016cb5f5d8a47037efc70b2e9df18e62e2afd7f7cb0773e77f929ff26bdf10cb"
+"linux/arm64" = "sha256:4b9a2a9a0c9e035a5157a20a7762829c415f6397530032f416f26a0bb99cc123"
+"windows/amd64" = "sha256:6361719ba1116f09a8b0f84c385e981009dc7c80bddf30a4390eafbc48c0a4b0"
+"windows/arm64" = "sha256:db8450b778cc13516546d064cd708680ae2b98262c482a4091a7332c3d70bc4a"
 
 [[tool]]
 name = "mirror"
 group = "default"
-repository = "dev.ocx.sh/ocx/mirror"
+repository = "ocx.sh/ocx/mirror"
 
 [tool.platforms]
-"darwin/amd64" = "sha256:51b9383ddda31ece7a209ab83822b99b8eca6096ea2eb195bbd0a27697a3e885"
-"darwin/arm64" = "sha256:f423337db7bb1a4d219ea2a4179b4085dc31a96d2afc0afe85eb59bee64ffbb6"
-"linux/amd64" = "sha256:014f385e2f50483025dae0e04339f6fb7719742c311b9c5d808d79f90026efaa"
-"linux/arm64" = "sha256:a4aea956d6568b3839b425093038f6fe582d9584dbad0a7c1dd86e0c4a3a2363"
-"windows/amd64" = "sha256:d6d4e6433f2d4a88743aba1ce6045bfc1853f863766f795a8575ead8f2e1cf3b"
-"windows/arm64" = "sha256:578b8658c60d9b0eda163d7bf3f42a2cd6029b6c3c4987727f38e309a4611ada"
+"darwin/amd64" = "sha256:ba6138bab428052fcf6db82d387c6d4720fb9b33d7a28ba1b32ea7d290afc4e5"
+"darwin/arm64" = "sha256:bcc479bf9239c60a08517cb1f01db5d142fa4e092b6a140a5e40cb669c0c93a0"
+"linux/amd64" = "sha256:664bb58d35ec3735a633ae3169e072ece8a585943006736277085b24934c765d"
+"linux/arm64" = "sha256:12b5429ca012870bd19bda5f0edfceffbd409d1d622a2608e1df1953e38a0a32"
+"windows/amd64" = "sha256:cd3dfa49f2deb2878633648163dcd92ae5826f1d71fe27b8677cda7aad6a34b9"
+"windows/arm64" = "sha256:e38783f99f0bb9530414adc84a00e9d48f2176c86c04369a0b108e2dd71ae897"
