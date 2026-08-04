@@ -65,7 +65,7 @@ versions:
   # workflow only fires on workflow_dispatch + push, never auto-discovering.
   # Staggered against the repo's other specs so the five don't hit the GitHub
   # releases API in the same minute.
-  poll_interval: "0 */6 * * *"
+  poll_interval: "2 1-23/6 * * *"
 
 tests:
   # `script:` paths resolve from the repository root, not from this spec's

@@ -6,7 +6,7 @@ name: bazelisk
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '2 1-23/6 * * *'
   workflow_dispatch:
   push:
     branches: [main]

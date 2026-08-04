@@ -53,7 +53,7 @@ versions:
   new_per_run: 5
   # Staggered against the repo's other specs so the five don't hit the GitHub
   # releases API in the same minute.
-  poll_interval: "30 */6 * * *"
+  poll_interval: "7 5-23/6 * * *"
 
 tests:
   # `script:` paths resolve from the repository root, not from this spec's
