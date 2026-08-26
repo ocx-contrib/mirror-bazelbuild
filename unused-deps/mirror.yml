@@ -6,8 +6,13 @@ target:
   repository: ocx-contrib/bazelbuild/unused-deps
 
 source:
+  # `bazelbuild/buildtools` → `bazel-contrib/buildtools`: the repo moved orgs
+  # (default branch is `main` now too). GitHub redirects the old path, so
+  # discovery kept working — but a redirect is upstream's courtesy, not a
+  # guarantee, so the spec names the real owner. The published coordinate
+  # stays `bazelbuild/<tool>`: re-homing it would orphan every consumer pin.
   type: github_release
-  owner: bazelbuild
+  owner: bazel-contrib
   repo: buildtools
   # buildtools tags are bare X.Y.Z, unlike bazelisk's `v`-prefixed tags.
   tag_pattern: "^(?P<version>\\d+\\.\\d+\\.\\d+)$"
