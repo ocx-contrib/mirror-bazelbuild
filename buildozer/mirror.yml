@@ -14,8 +14,12 @@ source:
   type: github_release
   owner: bazel-contrib
   repo: buildtools
-  # buildtools tags are bare X.Y.Z, unlike bazelisk's `v`-prefixed tags.
-  tag_pattern: "^(?P<version>\\d+\\.\\d+\\.\\d+)$"
+  # Tag spelling changed mid-history: bare X.Y.Z through 6.1.1, `v`-prefixed
+  # from v6.1.2 (2023-04-27) on. Both spellings map to the same version, and
+  # no version is published under both, so one optional-`v` pattern covers the
+  # whole range. A bare-only pattern silently skipped every release from 6.1.2
+  # to 8.5.1 — the discovery reports no candidates rather than an error.
+  tag_pattern: "^v?(?P<version>\\d+\\.\\d+\\.\\d+)$"
 
 # Raw binaries — no archive. One file per platform, versionless names.
 # windows/arm64 exists from 8.5.1 on; earlier versions simply resolve no asset
