@@ -54,11 +54,9 @@ catalog:
   logo: ../logo.svg
 
 versions:
-  # v0.22.0 (2023-03-29) is the first release carrying all five platforms; older
-  # releases lack linux/arm64 (v0.16.2 and earlier) or darwin/arm64 entirely, and
-  # v0.21.x/v0.23.0-1 have gaps. Raising the floor above 0.22.0 would drop
-  # nothing but history; lowering it publishes arm64-less versions.
-  min: "0.22.0"
+  # Owner decision 2026-11-15: keep the registry small — newest three releases
+  # only. (v0.22.0 is the first release with all five platforms, if ever widened.)
+  min: "0.31.0"
   new_per_run: 5
   # Hash-staggered slot from poll_stagger.py bazelbuild/ibazel.
   poll_interval: "34 3-23/6 * * *"
