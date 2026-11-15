@@ -73,8 +73,8 @@ New-Item -ItemType SymbolicLink -Path "$env:PATH_ENTRY\bazel.exe" -Target (Get-C
 ## Editing
 
 One directory per package — `bazelisk/`, `bazel/`, `buildifier/`, `buildozer/`,
-`unused-deps/` — each holding its own `mirror.yml`, `metadata.json`,
-`CATALOG.md` and `tests/`. `mirror-base.yml` at the root carries what all five
+`unused-deps/`, `ibazel/` — each holding its own `mirror.yml`, `metadata.json`,
+`CATALOG.md` and `tests/`. `mirror-base.yml` at the root carries what all six
 share (`platforms:`, `concurrency:`, `notify:`, `verify:`, `skip_prereleases`,
 `cascade`, `build_timestamp`); each spec pulls it in with
 `extends: ../mirror-base.yml`. The merge is shallow, so a spec that needs a

@@ -1,0 +1,73 @@
+extends: ../mirror-base.yml
+
+name: ibazel
+target:
+  registry: ghcr.io
+  repository: ocx-contrib/bazelbuild/ibazel
+
+source:
+  # Upstream repo is `bazelbuild/bazel-watcher`; the tool ships (release assets,
+  # npm `@bazel/ibazel`) as `ibazel`, so the package takes that name — same
+  # split as buildifier from buildtools.
+  type: github_release
+  owner: bazelbuild
+  repo: bazel-watcher
+  # Tag spelling is not uniform: `v0.26.10` but also `V0.26.9`, `V0.26.6`,
+  # `V0.26.4`, `V0.25.1` (capital V). `[vV]?` covers both; a lowercase-only
+  # pattern silently skips those releases (discovery reports no candidates, not
+  # an error). `v0.15.1`-era prereleases are filtered by skip_prereleases.
+  tag_pattern: "^[vV]?(?P<version>\\d+\\.\\d+\\.\\d+)$"
+
+# Raw binaries — no archive. One file per platform, versionless names.
+# Linux keys are bare (empty os.features): both linux binaries are Go builds
+# that `file` reports as "statically linked" and `readelf -d` reports "There is
+# no dynamic section" (v0.33.0 amd64+arm64, v0.16.2 amd64) — no libc at all, so
+# no `+libc.musl` qualifier is needed and the alpine container leg proves it.
+#
+# Upstream ships NO windows/arm64 (checked across every release since
+# v0.22.0) — not an omission here. darwin/amd64 is absent from v0.29.0-v0.30.0
+# and v0.25.2-v0.25.3 and a few 0.26.x tags, and several tags (v0.26.0, v0.26.3,
+# v0.26.5, v0.23.x linux) carry partial or no assets: those versions resolve no
+# asset for the missing platform and publish under their exact tag only, so
+# no per-platform floor is needed.
+assets:
+  linux/amd64:
+    - "^ibazel_linux_amd64$"
+  linux/arm64:
+    - "^ibazel_linux_arm64$"
+  darwin/amd64:
+    - "^ibazel_darwin_amd64$"
+  darwin/arm64:
+    - "^ibazel_darwin_arm64$"
+  windows/amd64:
+    - "^ibazel_windows_amd64\\.exe$"
+
+asset_type:
+  type: binary
+  name: ibazel
+
+metadata:
+  default: metadata.json
+
+catalog:
+  # Shared repo-root logo; the default probe only looks in the spec's directory.
+  logo: ../logo.svg
+
+versions:
+  # v0.22.0 (2023-03-29) is the first release carrying all five platforms; older
+  # releases lack linux/arm64 (v0.16.2 and earlier) or darwin/arm64 entirely, and
+  # v0.21.x/v0.23.0-1 have gaps. Raising the floor above 0.22.0 would drop
+  # nothing but history; lowering it publishes arm64-less versions.
+  min: "0.22.0"
+  new_per_run: 5
+  # Hash-staggered slot from poll_stagger.py bazelbuild/ibazel.
+  poll_interval: "34 3-23/6 * * *"
+
+tests:
+  # `script:` paths resolve from the repository root.
+  - name: smoke
+    script: ibazel/tests/smoke.star
+
+announce:
+  package: bazelbuild/ibazel
+  fork: ocx-contrib/index
